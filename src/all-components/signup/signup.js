@@ -56,6 +56,8 @@ export default function Signup(props){
 
         axios.put('/user-update',meraData ).then(function(resp){
           console.log(resp.data);
+        }).catch(function(resp){
+          console.log(resp);
         })
 
         // dispatch({
@@ -78,8 +80,17 @@ export default function Signup(props){
             meraForm.append("pic",      file)
         }
 
-      axios.post('/create-user', meraForm).then(function(){
-        toast.success("Signuped sucessfully!");
+// 200,sb OK chal raha
+// 300, redirection
+// 400, 404-not found, 403-authorized nahi h
+// 500, server se related
+
+      axios.post('/create-user', meraForm).then(function(resp){
+        // resp.data
+        NotificationManager.success("Signuped sucessfully!");
+      }).catch(function(resp){
+        NotificationManager.error(resp.response.data.message)
+        console.log(resp.response.data.message);
       })
 
       //  dispatch({
@@ -90,7 +101,6 @@ export default function Signup(props){
 
         // props.abc.push(meraData)
 
-        NotificationManager.success("user create hogya wa");
     //   setUsers([...users])
   
       console.log(meraData)

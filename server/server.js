@@ -2,6 +2,9 @@
 
 let tokenWali = require('jsonwebtoken');
 
+let fs = require('fs')
+
+
 
  // systemjs format
 // import flana from flanPath;
@@ -15,7 +18,24 @@ let multer = require('multer');
 
 const meriFileSetting = multer.diskStorage({
     destination: function (req, file, cb) {
-      cb(null, './server/my-uploads')
+
+
+
+        let path = './server/my-uploads/'+req.body.name;
+        
+        let folderParaHua = fs.existsSync(path);
+
+        if(folderParaHua  == false){
+            fs.mkdir(path,function(){
+                
+                cb(null, path);
+
+            });
+        }else{
+            cb({message:"USer already h "}, null);
+        }
+
+
     },
     filename: function (req, file, cb) {
       cb(null, file.originalname);
@@ -84,6 +104,12 @@ meriApp.post('/login', function(req, res){
 meriApp.put('/user-update', function(req, res){
 
     let userIndex = users.findIndex(user=>user.id == req.body.id);
+
+    let user = users[userIndex];
+
+    fs.renameSync('./server/my-uploads/'+user.name, './server/my-uploads/'+req.body.name);
+
+
     users[userIndex] = req.body;
 
     res.json({
@@ -101,9 +127,16 @@ meriApp.get('/user-lao', function(req, res){
 
 meriApp.delete('/user-delete', function(req, res){
 
+    let user = users.find(user=>user.id == req.query.anc);
+
+    fs.rmSync('./server/my-uploads/'+user.name, { recursive: true, force: true });
+        
     users = users.filter(user=>user.id != req.query.anc);
-    
     res.json({success:true})
+
+
+
+    
 
     console.log(req.query.anc);
 
@@ -137,6 +170,10 @@ meriApp.get('/abc', function(reqeust, response){
 
 meriApp.use(myExpress.static('./server/build'))
 meriApp.use(myExpress.static('./server/my-uploads'));
+
+meriApp.use(function(err, req, res, cb){
+    res.status(500).json(err);
+})
 
 meriApp.listen(3002, function(){
     console.log("server chaling now");
