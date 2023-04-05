@@ -1,0 +1,9 @@
+#user-box{
+    margin-left: 300px;
+}
+
+.user-thumb1{
+    width: 25px;
+    border-radius: 25px;
+    vertical-align: middle;
+}
